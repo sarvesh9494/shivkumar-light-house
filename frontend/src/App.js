@@ -1,4 +1,3 @@
-// src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -18,11 +17,7 @@ function App() {
   return (
     <Router>
       <Routes>
-
-        {/* Admin — no Navbar/Footer */}
         <Route path="/admin" element={<AdminPage />} />
-
-        {/* All public pages — with Navbar + Footer */}
         <Route path="/" element={<><Navbar /><HomePage /><Footer /></>} />
         <Route path="/products" element={<><Navbar /><ProductsPage /><Footer /></>} />
         <Route path="/product/:id" element={<><Navbar /><ProductDetailsPage /><Footer /></>} />
@@ -32,7 +27,6 @@ function App() {
         <Route path="/register" element={<><Navbar /><RegisterPage /><Footer /></>} />
         <Route path="/about" element={<><Navbar /><AboutPage /><Footer /></>} />
         <Route path="/contact" element={<><Navbar /><ContactPage /><Footer /></>} />
-
       </Routes>
     </Router>
   );

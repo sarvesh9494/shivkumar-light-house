@@ -1,9 +1,9 @@
 // src/components/Navbar.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar, Toolbar, Box, Typography, Button, IconButton,
   InputBase, Drawer, List, ListItem, ListItemText, Divider,
-  useMediaQuery, useTheme,
+  useMediaQuery, useTheme, Menu, MenuItem,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -20,9 +20,26 @@ const NAV_LINKS = [
 function Navbar() {
   const [search, setSearch] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  // Check if user is logged in
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      try { setUser(JSON.parse(stored)); } catch { setUser(null); }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    setAnchorEl(null);
+    navigate("/");
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -44,11 +61,10 @@ function Navbar() {
           📍 Main Road, Kadegaon, Sangli, Maharashtra
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography variant="caption" sx={{ color: "#aaa" }}>
+          <Typography variant="caption" sx={{ color: "#aaa", display: { xs: "none", sm: "block" } }}>
             🕐 Mon–Sun: 9:30 AM – 8:30 PM
           </Typography>
-          <Box
-            component="a" href={`tel:${PHONE}`}
+          <Box component="a" href={`tel:${PHONE}`}
             sx={{ color: "#ffd700", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
             📞 {PHONE}
           </Box>
@@ -68,9 +84,7 @@ function Navbar() {
             textDecoration: "none", flexShrink: 0,
           }}>
             <Box
-              component="img"
-              src="/logo.jpeg"
-              alt="Shivkumar Light House"
+              component="img" src="/logo.jpeg" alt="Shivkumar Light House"
               onError={(e) => { e.target.style.display = "none"; }}
               sx={{ height: 48, width: 48, objectFit: "contain", borderRadius: 1 }}
             />
@@ -85,10 +99,9 @@ function Navbar() {
             </Box>
           </Box>
 
-          {/* Search bar — center */}
+          {/* Search bar */}
           <Box
-            component="form"
-            onSubmit={handleSearch}
+            component="form" onSubmit={handleSearch}
             sx={{
               flex: 1, mx: { xs: 1, md: 3 },
               display: "flex", alignItems: "center",
@@ -103,18 +116,14 @@ function Navbar() {
               placeholder="Search fans, bulbs, switches..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              fullWidth
-              sx={{ fontSize: 14 }}
+              fullWidth sx={{ fontSize: 14 }}
             />
-            <Button
-              type="submit"
-              size="small"
-              sx={{
-                background: "#c72026", color: "#fff", borderRadius: "6px",
-                px: 1.5, minWidth: 0, fontWeight: 700, fontSize: 12,
-                "&:hover": { background: "#a51a1a" },
-                display: { xs: "none", sm: "flex" },
-              }}>
+            <Button type="submit" size="small" sx={{
+              background: "#c72026", color: "#fff", borderRadius: "6px",
+              px: 1.5, minWidth: 0, fontWeight: 700, fontSize: 12,
+              "&:hover": { background: "#a51a1a" },
+              display: { xs: "none", sm: "flex" },
+            }}>
               Search
             </Button>
           </Box>
@@ -134,16 +143,45 @@ function Navbar() {
                 WhatsApp
               </Button>
 
-              {/* Login */}
-              <Button
-                component={Link} to="/login"
-                sx={{
-                  border: "1.5px solid #c72026", color: "#c72026",
-                  fontWeight: 700, borderRadius: "8px", px: 2, fontSize: 12,
-                  "&:hover": { background: "#ffebee" },
-                }}>
-                👤 Login
-              </Button>
+              {/* Login / User menu */}
+              {user ? (
+                <>
+                  <Button
+                    onClick={(e) => setAnchorEl(e.currentTarget)}
+                    sx={{
+                      border: "1.5px solid #c72026", color: "#c72026",
+                      fontWeight: 700, borderRadius: "8px", px: 2, fontSize: 12,
+                      "&:hover": { background: "#ffebee" },
+                    }}>
+                    👤 {user.name.split(" ")[0]}
+                  </Button>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={() => setAnchorEl(null)}
+                    PaperProps={{ sx: { borderRadius: 2, mt: 1, minWidth: 160 } }}>
+                    <MenuItem disabled>
+                      <Typography variant="caption" color="text.secondary">
+                        {user.email}
+                      </Typography>
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem onClick={handleLogout} sx={{ color: "#c72026", fontWeight: 700 }}>
+                      🚪 Logout
+                    </MenuItem>
+                  </Menu>
+                </>
+              ) : (
+                <Button
+                  component={Link} to="/login"
+                  sx={{
+                    border: "1.5px solid #c72026", color: "#c72026",
+                    fontWeight: 700, borderRadius: "8px", px: 2, fontSize: 12,
+                    "&:hover": { background: "#ffebee" },
+                  }}>
+                  👤 Login
+                </Button>
+              )}
             </Box>
           )}
 
@@ -157,20 +195,15 @@ function Navbar() {
 
         {/* ── Nav links row (desktop) ── */}
         {!isMobile && (
-          <Box sx={{
-            display: "flex", alignItems: "center",
-            px: 3, pb: 0.5, gap: 0.5,
-          }}>
+          <Box sx={{ display: "flex", alignItems: "center", px: 3, pb: 0.5, gap: 0.5 }}>
             {NAV_LINKS.map((link) => (
               <Button
                 key={link.path}
-                component={Link}
-                to={link.path}
+                component={Link} to={link.path}
                 sx={{
                   color: "#333", fontWeight: 600, fontSize: 13,
                   borderRadius: "6px", px: 2,
                   "&:hover": { color: "#c72026", background: "#ffebee" },
-                  "&.active": { color: "#c72026" },
                 }}>
                 {link.label}
               </Button>
@@ -182,7 +215,6 @@ function Navbar() {
       {/* ── MOBILE DRAWER ── */}
       <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
         <Box sx={{ width: 270, pt: 2 }}>
-          {/* Logo in drawer */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, px: 2, pb: 2 }}>
             <Box component="img" src="/logo.jpeg" alt="logo"
               sx={{ height: 44, width: 44, objectFit: "contain", borderRadius: 1 }} />
@@ -193,12 +225,21 @@ function Navbar() {
           </Box>
           <Divider />
 
+          {/* Show user name if logged in */}
+          {user && (
+            <Box sx={{ px: 2, py: 1.5, background: "#fff3e0" }}>
+              <Typography fontSize={13} fontWeight={700} color="#e65100">
+                👤 {user.name}
+              </Typography>
+              <Typography fontSize={11} color="text.secondary">{user.email}</Typography>
+            </Box>
+          )}
+
           <List>
             {NAV_LINKS.map((link) => (
               <ListItem
                 key={link.path}
-                component={Link}
-                to={link.path}
+                component={Link} to={link.path}
                 onClick={() => setDrawerOpen(false)}
                 sx={{ "&:hover": { background: "#ffebee" }, cursor: "pointer" }}>
                 <ListItemText primary={link.label} primaryTypographyProps={{ fontWeight: 600 }} />
@@ -207,19 +248,29 @@ function Navbar() {
           </List>
           <Divider />
 
-          {/* WhatsApp + Login in drawer */}
           <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1.5 }}>
             <Button
               component="a" href={WA_LINK} target="_blank" fullWidth
               sx={{ background: "#25D366", color: "#fff", fontWeight: 700, borderRadius: "8px" }}>
               💬 WhatsApp Us
             </Button>
-            <Button
-              component={Link} to="/login" fullWidth
-              onClick={() => setDrawerOpen(false)}
-              sx={{ border: "1.5px solid #c72026", color: "#c72026", fontWeight: 700, borderRadius: "8px" }}>
-              👤 Login / Register
-            </Button>
+
+            {user ? (
+              <Button
+                onClick={() => { handleLogout(); setDrawerOpen(false); }}
+                fullWidth variant="outlined"
+                sx={{ borderColor: "#c72026", color: "#c72026", fontWeight: 700, borderRadius: "8px" }}>
+                🚪 Logout
+              </Button>
+            ) : (
+              <Button
+                component={Link} to="/login" fullWidth
+                onClick={() => setDrawerOpen(false)}
+                sx={{ border: "1.5px solid #c72026", color: "#c72026", fontWeight: 700, borderRadius: "8px" }}>
+                👤 Login / Register
+              </Button>
+            )}
+
             <Typography variant="caption" color="text.secondary" textAlign="center">
               📞 <a href={`tel:${PHONE}`} style={{ color: "#c72026", fontWeight: 700 }}>{PHONE}</a>
             </Typography>
