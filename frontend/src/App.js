@@ -1,7 +1,4 @@
 // src/App.js
-// ── Add this route to your existing App.js ──────────────────────────────────
-// Just copy-paste the import and the <Route> line below into your existing App.js
-
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -13,37 +10,29 @@ import CategoryPage from "./pages/CategoryPage";
 import CategoryProductsPage from "./pages/CategoryProductsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-
-// ── NEW: Import Admin Page ──
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 import AdminPage from "./pages/AdminPage";
 
 function App() {
   return (
     <Router>
-      {/* Hide Navbar on /admin if you want a standalone admin experience */}
       <Routes>
-        {/* ── ADMIN ROUTE (no Navbar/Footer for clean panel look) ── */}
+
+        {/* Admin — no Navbar/Footer */}
         <Route path="/admin" element={<AdminPage />} />
 
-        {/* ── PUBLIC ROUTES ── */}
-        <Route
-          path="/*"
-          element={
-            <>
-              <Navbar />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/products" element={<ProductsPage />} />
-                <Route path="/product/:id" element={<ProductDetailsPage />} />
-                <Route path="/category/:category" element={<CategoryPage />} />
-                <Route path="/category-products/:category" element={<CategoryProductsPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-              </Routes>
-              <Footer />
-            </>
-          }
-        />
+        {/* All public pages — with Navbar + Footer */}
+        <Route path="/" element={<><Navbar /><HomePage /><Footer /></>} />
+        <Route path="/products" element={<><Navbar /><ProductsPage /><Footer /></>} />
+        <Route path="/product/:id" element={<><Navbar /><ProductDetailsPage /><Footer /></>} />
+        <Route path="/category/:category" element={<><Navbar /><CategoryPage /><Footer /></>} />
+        <Route path="/category-products/:category" element={<><Navbar /><CategoryProductsPage /><Footer /></>} />
+        <Route path="/login" element={<><Navbar /><LoginPage /><Footer /></>} />
+        <Route path="/register" element={<><Navbar /><RegisterPage /><Footer /></>} />
+        <Route path="/about" element={<><Navbar /><AboutPage /><Footer /></>} />
+        <Route path="/contact" element={<><Navbar /><ContactPage /><Footer /></>} />
+
       </Routes>
     </Router>
   );
