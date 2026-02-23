@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import {
   AppBar, Toolbar, Box, Typography, Button, IconButton,
   InputBase, Drawer, List, ListItem, ListItemText, Divider,
-  useMediaQuery, useTheme, Badge,
+  useMediaQuery, useTheme,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 
