@@ -751,7 +751,103 @@ function HomepageEditor({ notify }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Main AdminPage
 // ─────────────────────────────────────────────────────────────────────────────
+// ── Admin password (change this to your own secret password) ─────────────
+const ADMIN_PASSWORD = "shivkumar@admin2024";
+
+// ── Admin Login Screen ────────────────────────────────────────────────────
+function AdminLogin({ onSuccess }) {
+  const [pass, setPass] = useState("");
+  const [error, setError] = useState("");
+  const [show, setShow] = useState(false);
+
+  const handleLogin = () => {
+    if (pass === ADMIN_PASSWORD) {
+      sessionStorage.setItem("adminAuth", "true");
+      onSuccess();
+    } else {
+      setError("❌ Wrong password. Try again.");
+      setPass("");
+    }
+  };
+
+  return (
+    <Box sx={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #1a1a2e 0%, #c72026 100%)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
+      <Box sx={{
+        background: "#fff", borderRadius: 4, p: 5,
+        width: "100%", maxWidth: 400,
+        boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
+        textAlign: "center",
+      }}>
+        <Typography fontSize={56} mb={1}>🔐</Typography>
+        <Typography variant="h5" fontWeight={900} color="#1a1a2e" mb={0.5}>
+          Admin Panel
+        </Typography>
+        <Typography variant="body2" color="text.secondary" mb={3}>
+          Shivkumar Light House — Restricted Access
+        </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }} onClose={() => setError("")}>
+            {error}
+          </Alert>
+        )}
+
+        <TextField
+          label="Admin Password"
+          type={show ? "text" : "password"}
+          fullWidth
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+          sx={{
+            mb: 2.5,
+            "& .MuiOutlinedInput-root": {
+              "&:hover fieldset": { borderColor: "#c72026" },
+              "&.Mui-focused fieldset": { borderColor: "#c72026" },
+              borderRadius: "10px",
+            },
+            "& .MuiInputLabel-root.Mui-focused": { color: "#c72026" },
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShow(!show)} size="small">
+                  <Typography fontSize={18}>{show ? "🙈" : "👁️"}</Typography>
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <Button
+          onClick={handleLogin}
+          variant="contained"
+          fullWidth
+          size="large"
+          sx={{
+            background: "linear-gradient(135deg, #c72026, #e53935)",
+            fontWeight: 800, borderRadius: "10px", py: 1.6, fontSize: 15,
+            "&:hover": { background: "linear-gradient(135deg, #a51a1a, #c62828)" },
+          }}>
+          🔓 Login to Admin
+        </Button>
+
+        <Typography variant="caption" color="text.secondary" display="block" mt={2}>
+          Shivkumar Light House © {new Date().getFullYear()}
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
+
 export default function AdminPage() {
+  const [isAuth, setIsAuth] = useState(
+    sessionStorage.getItem("adminAuth") === "true"
+  );
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState(0);
@@ -837,6 +933,9 @@ export default function AdminPage() {
     </TableCell>
   );
 
+  // ── If not authenticated show login screen ──
+  if (!isAuth) return <AdminLogin onSuccess={() => setIsAuth(true)} />;
+
   return (
     <Box sx={{ minHeight: "100vh", background: "#f0f2f7" }}>
       <Box sx={{
@@ -847,6 +946,7 @@ export default function AdminPage() {
       }}>
         <Box>
           <Typography variant="h5" fontWeight={900} letterSpacing={0.5}>⚡ Admin Panel</Typography>
+          <Typography variant="caption" sx={{ opacity: 0.6 }}>Shivkumar Light House — Secured Access</Typography>
           <Typography variant="body2" sx={{ opacity: 0.55, mt: 0.3 }}>Shivkumar Light House</Typography>
         </Box>
         <Button variant="contained" onClick={() => setAddOpen(true)} sx={{
