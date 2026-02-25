@@ -10,7 +10,15 @@ import SiteConfig from "./models/SiteConfig.js";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://shivkumarlighthouse.in",
+    "https://www.shivkumarlighthouse.in",
+    "https://shivkumar-light-house9494.vercel.app",
+    "http://localhost:3000"
+  ],
+  credentials: true,
+}));
 app.use(express.json({ limit: "5mb" })); // ✅ allow larger payloads for banner arrays
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 mongoose.set("strictQuery", false);
