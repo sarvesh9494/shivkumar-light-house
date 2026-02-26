@@ -5,61 +5,57 @@ import {
   Divider, Alert, CircularProgress, Tab, Tabs, InputAdornment, IconButton,
 } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import axios from "axios";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-const fx = {
+const fieldSx = {
   "& .MuiOutlinedInput-root": {
+    borderRadius: "10px",
     "&:hover fieldset": { borderColor: "#c72026" },
     "&.Mui-focused fieldset": { borderColor: "#c72026" },
-    borderRadius: "10px",
   },
   "& .MuiInputLabel-root.Mui-focused": { color: "#c72026" },
 };
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState(0); // 0 = Login, 1 = Register
+  const [tab, setTab] = useState(0);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  // Login form
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-
-  // Register form
   const [regForm, setRegForm] = useState({ name: "", email: "", password: "", confirm: "" });
 
-  // ── LOGIN ──────────────────────────────────────────────────────────────────
   const handleLogin = async () => {
     setError(""); setSuccess("");
     if (!loginForm.email || !loginForm.password) {
-      setError("Please enter email and password."); return;
+      setError("Please enter your email and password."); return;
     }
     setLoading(true);
     try {
       const res = await axios.post(`${API}/api/login`, {
-        email: loginForm.email,
-        password: loginForm.password,
+        email: loginForm.email, password: loginForm.password,
       });
-      // Save user to localStorage
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      setSuccess(`Welcome back, ${res.data.user.name}! 🎉`);
+      setSuccess(`Welcome back, ${res.data.user.name}!`);
       setTimeout(() => navigate("/"), 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password.");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  // ── REGISTER ───────────────────────────────────────────────────────────────
   const handleRegister = async () => {
     setError(""); setSuccess("");
     if (!regForm.name || !regForm.email || !regForm.password) {
-      setError("Please fill all fields."); return;
+      setError("Please fill in all fields."); return;
     }
     if (regForm.password !== regForm.confirm) {
       setError("Passwords do not match."); return;
@@ -70,18 +66,14 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await axios.post(`${API}/api/register`, {
-        name: regForm.name,
-        email: regForm.email,
-        password: regForm.password,
+        name: regForm.name, email: regForm.email, password: regForm.password,
       });
-      setSuccess("Account created! Please login now. ✅");
+      setSuccess("Account created successfully! Please login.");
       setRegForm({ name: "", email: "", password: "", confirm: "" });
       setTimeout(() => setTab(0), 2000);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Email may already exist.");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
@@ -93,54 +85,48 @@ export default function LoginPage() {
     }}>
       <Container maxWidth="sm">
         <Box sx={{
-          background: "#fff",
-          borderRadius: 4,
-          overflow: "hidden",
-          boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
+          background: "#fff", borderRadius: 4, overflow: "hidden",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.35)",
         }}>
 
-          {/* ── Header ── */}
+          {/* Header */}
           <Box sx={{
             background: "linear-gradient(135deg, #c72026, #e53935)",
             px: 4, py: 3, textAlign: "center",
           }}>
-            <Box
-              component={Link} to="/"
-              sx={{ display: "inline-flex", alignItems: "center", gap: 1.5, textDecoration: "none", mb: 1 }}>
-              <Box
-                component="img" src="/logo.jpeg" alt="logo"
+            <Box component={Link} to="/"
+              sx={{ display: "inline-flex", alignItems: "center", gap: 1.5, textDecoration: "none", mb: 0.5 }}>
+              <Box component="img" src="/logo.jpeg" alt="logo"
                 onError={(e) => { e.target.style.display = "none"; }}
                 sx={{ height: 44, width: 44, objectFit: "contain", borderRadius: 1 }}
               />
               <Box sx={{ textAlign: "left" }}>
-                <Typography fontWeight={900} color="#fff" fontSize={16} lineHeight={1.1}>
+                <Typography fontWeight={900} color="#fff" fontSize={15} lineHeight={1.15}>
                   Shivkumar Light House
                 </Typography>
                 <Typography fontSize={11} color="rgba(255,255,255,0.8)">
-                  ⚡ Trusted Electrical Store
+                  Trusted Electrical Store
                 </Typography>
               </Box>
             </Box>
           </Box>
 
-          {/* ── Tabs ── */}
-          <Tabs
-            value={tab}
+          {/* Tabs */}
+          <Tabs value={tab}
             onChange={(_, v) => { setTab(v); setError(""); setSuccess(""); }}
             variant="fullWidth"
             sx={{
               borderBottom: "1px solid #f0f0f0",
-              "& .MuiTab-root": { fontWeight: 700, fontSize: 14, py: 2 },
+              "& .MuiTab-root": { fontWeight: 700, fontSize: 13, py: 2, textTransform: "none" },
               "& .Mui-selected": { color: "#c72026 !important" },
-              "& .MuiTabs-indicator": { background: "#c72026", height: 3 },
+              "& .MuiTabs-indicator": { background: "#c72026", height: 2.5 },
             }}>
-            <Tab label="👤 Login" />
-            <Tab label="📝 Register" />
+            <Tab label="Login" />
+            <Tab label="Register" />
           </Tabs>
 
           <Box sx={{ px: { xs: 3, sm: 4 }, py: 4 }}>
 
-            {/* ── Alerts ── */}
             {error && (
               <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }} onClose={() => setError("")}>
                 {error}
@@ -152,155 +138,141 @@ export default function LoginPage() {
               </Alert>
             )}
 
-            {/* ══ LOGIN FORM ══ */}
+            {/* LOGIN FORM */}
             {tab === 0 && (
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-                <TextField
-                  label="Email Address"
-                  type="email"
-                  fullWidth sx={fx}
+                <TextField label="Email Address" type="email" fullWidth sx={fieldSx}
                   value={loginForm.email}
                   onChange={(e) => setLoginForm(f => ({ ...f, email: e.target.value }))}
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">✉️</InputAdornment>,
+                    startAdornment: <InputAdornment position="start">
+                      <EmailOutlinedIcon sx={{ fontSize: 20, color: "#999" }} />
+                    </InputAdornment>,
                   }}
                 />
-                <TextField
-                  label="Password"
-                  type={showPass ? "text" : "password"}
-                  fullWidth sx={fx}
+                <TextField label="Password" type={showPass ? "text" : "password"} fullWidth sx={fieldSx}
                   value={loginForm.password}
                   onChange={(e) => setLoginForm(f => ({ ...f, password: e.target.value }))}
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">🔒</InputAdornment>,
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPass(!showPass)} edge="end" size="small">
-                          <Typography fontSize={16}>{showPass ? "🙈" : "👁️"}</Typography>
-                        </IconButton>
-                      </InputAdornment>
-                    ),
+                    startAdornment: <InputAdornment position="start">
+                      <LockOutlinedIcon sx={{ fontSize: 20, color: "#999" }} />
+                    </InputAdornment>,
+                    endAdornment: <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPass(!showPass)} edge="end" size="small">
+                        {showPass
+                          ? <VisibilityOffOutlinedIcon sx={{ fontSize: 20 }} />
+                          : <VisibilityOutlinedIcon sx={{ fontSize: 20 }} />}
+                      </IconButton>
+                    </InputAdornment>,
                   }}
                 />
 
-                <Button
-                  onClick={handleLogin}
-                  disabled={loading}
-                  variant="contained"
-                  fullWidth
-                  size="large"
+                <Button onClick={handleLogin} disabled={loading} variant="contained"
+                  disableElevation fullWidth size="large"
                   sx={{
                     background: "linear-gradient(135deg, #c72026, #e53935)",
-                    fontWeight: 800, borderRadius: "10px", py: 1.6, fontSize: 15,
+                    fontWeight: 800, borderRadius: "10px", py: 1.6, fontSize: 14,
+                    textTransform: "none",
                     "&:hover": { background: "linear-gradient(135deg, #a51a1a, #c62828)" },
-                    "&:disabled": { background: "#ccc" },
                   }}>
-                  {loading ? <CircularProgress size={22} color="inherit" /> : "Login →"}
+                  {loading ? <CircularProgress size={22} color="inherit" /> : "Login"}
                 </Button>
 
-                <Divider sx={{ my: 0.5 }}>OR</Divider>
+                <Divider>
+                  <Typography variant="caption" color="text.secondary">OR</Typography>
+                </Divider>
 
-                <Button
-                  component="a"
-                  href={`https://wa.me/919503423737?text=Hi! I need help with my account.`}
-                  target="_blank"
-                  variant="outlined"
-                  fullWidth
+                <Button component="a"
+                  href="https://wa.me/919503423737?text=Hi! I need help with my account."
+                  target="_blank" variant="outlined" fullWidth
+                  startIcon={<WhatsAppIcon />}
                   sx={{
                     borderColor: "#25D366", color: "#25D366",
                     fontWeight: 700, borderRadius: "10px", py: 1.3,
+                    textTransform: "none",
                     "&:hover": { background: "#f0fff4", borderColor: "#25D366" },
                   }}>
-                  💬 Need help? WhatsApp Us
+                  Need help? WhatsApp Us
                 </Button>
 
                 <Typography textAlign="center" variant="body2" color="text.secondary">
                   Don't have an account?{" "}
-                  <Box
-                    component="span"
-                    onClick={() => setTab(1)}
-                    sx={{ color: "#c72026", fontWeight: 700, cursor: "pointer", "&:hover": { textDecoration: "underline" } }}>
+                  <Box component="span" onClick={() => setTab(1)}
+                    sx={{ color: "#c72026", fontWeight: 700, cursor: "pointer",
+                      "&:hover": { textDecoration: "underline" } }}>
                     Register here
                   </Box>
                 </Typography>
               </Box>
             )}
 
-            {/* ══ REGISTER FORM ══ */}
+            {/* REGISTER FORM */}
             {tab === 1 && (
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-                <TextField
-                  label="Full Name"
-                  fullWidth sx={fx}
+                <TextField label="Full Name" fullWidth sx={fieldSx}
                   value={regForm.name}
                   onChange={(e) => setRegForm(f => ({ ...f, name: e.target.value }))}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">👤</InputAdornment>,
+                    startAdornment: <InputAdornment position="start">
+                      <PersonOutlineIcon sx={{ fontSize: 20, color: "#999" }} />
+                    </InputAdornment>,
                   }}
                 />
-                <TextField
-                  label="Email Address"
-                  type="email"
-                  fullWidth sx={fx}
+                <TextField label="Email Address" type="email" fullWidth sx={fieldSx}
                   value={regForm.email}
                   onChange={(e) => setRegForm(f => ({ ...f, email: e.target.value }))}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">✉️</InputAdornment>,
+                    startAdornment: <InputAdornment position="start">
+                      <EmailOutlinedIcon sx={{ fontSize: 20, color: "#999" }} />
+                    </InputAdornment>,
                   }}
                 />
-                <TextField
-                  label="Password"
-                  type={showPass ? "text" : "password"}
-                  fullWidth sx={fx}
+                <TextField label="Password" type={showPass ? "text" : "password"} fullWidth sx={fieldSx}
                   value={regForm.password}
                   onChange={(e) => setRegForm(f => ({ ...f, password: e.target.value }))}
                   helperText="Minimum 6 characters"
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">🔒</InputAdornment>,
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPass(!showPass)} edge="end" size="small">
-                          <Typography fontSize={16}>{showPass ? "🙈" : "👁️"}</Typography>
-                        </IconButton>
-                      </InputAdornment>
-                    ),
+                    startAdornment: <InputAdornment position="start">
+                      <LockOutlinedIcon sx={{ fontSize: 20, color: "#999" }} />
+                    </InputAdornment>,
+                    endAdornment: <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPass(!showPass)} edge="end" size="small">
+                        {showPass
+                          ? <VisibilityOffOutlinedIcon sx={{ fontSize: 20 }} />
+                          : <VisibilityOutlinedIcon sx={{ fontSize: 20 }} />}
+                      </IconButton>
+                    </InputAdornment>,
                   }}
                 />
-                <TextField
-                  label="Confirm Password"
-                  type={showPass ? "text" : "password"}
-                  fullWidth sx={fx}
+                <TextField label="Confirm Password" type={showPass ? "text" : "password"} fullWidth sx={fieldSx}
                   value={regForm.confirm}
                   onChange={(e) => setRegForm(f => ({ ...f, confirm: e.target.value }))}
                   onKeyDown={(e) => e.key === "Enter" && handleRegister()}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">🔒</InputAdornment>,
+                    startAdornment: <InputAdornment position="start">
+                      <LockOutlinedIcon sx={{ fontSize: 20, color: "#999" }} />
+                    </InputAdornment>,
                   }}
                 />
 
-                <Button
-                  onClick={handleRegister}
-                  disabled={loading}
-                  variant="contained"
-                  fullWidth
-                  size="large"
+                <Button onClick={handleRegister} disabled={loading} variant="contained"
+                  disableElevation fullWidth size="large"
                   sx={{
                     background: "linear-gradient(135deg, #c72026, #e53935)",
-                    fontWeight: 800, borderRadius: "10px", py: 1.6, fontSize: 15,
+                    fontWeight: 800, borderRadius: "10px", py: 1.6, fontSize: 14,
+                    textTransform: "none",
                     "&:hover": { background: "linear-gradient(135deg, #a51a1a, #c62828)" },
-                    "&:disabled": { background: "#ccc" },
                   }}>
-                  {loading ? <CircularProgress size={22} color="inherit" /> : "Create Account →"}
+                  {loading ? <CircularProgress size={22} color="inherit" /> : "Create Account"}
                 </Button>
 
                 <Typography textAlign="center" variant="body2" color="text.secondary">
                   Already have an account?{" "}
-                  <Box
-                    component="span"
-                    onClick={() => setTab(0)}
-                    sx={{ color: "#c72026", fontWeight: 700, cursor: "pointer", "&:hover": { textDecoration: "underline" } }}>
+                  <Box component="span" onClick={() => setTab(0)}
+                    sx={{ color: "#c72026", fontWeight: 700, cursor: "pointer",
+                      "&:hover": { textDecoration: "underline" } }}>
                     Login here
                   </Box>
                 </Typography>
@@ -308,13 +280,11 @@ export default function LoginPage() {
             )}
           </Box>
 
-          {/* ── Footer ── */}
-          <Box sx={{
-            px: 4, py: 2, background: "#f9f9f9",
-            borderTop: "1px solid #f0f0f0", textAlign: "center",
-          }}>
+          {/* Footer */}
+          <Box sx={{ px: 4, py: 2, background: "#fafafa",
+            borderTop: "1px solid #f0f0f0", textAlign: "center" }}>
             <Typography variant="caption" color="text.secondary">
-              🔒 Your data is safe with us · Est. 1999 · Kadegaon, Sangli
+              Secured · Est. 1999 · Kadegaon, Sangli
             </Typography>
           </Box>
         </Box>
